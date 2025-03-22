@@ -58,19 +58,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _taxIdController = TextEditingController(text: userProfile["taxId"]);
     _investmentType = userProfile["investmentType"];
 
-    // Initialize existing documents from userProfile
     _existingDocuments = [];
     if (userProfile["idCopyUrl"] != null) {
-      _existingDocuments.add(Document(
-        name: 'ID Copy',
-        filePath: userProfile["idCopyUrl"],
-      ));
+      _existingDocuments.add(Document(name: 'ID Copy', filePath: userProfile["idCopyUrl"]));
     }
     if (userProfile["otherDocumentsUrl"] != null) {
-      _existingDocuments.add(Document(
-        name: 'Other Documents',
-        filePath: userProfile["otherDocumentsUrl"],
-      ));
+      _existingDocuments.add(Document(name: 'Other Documents', filePath: userProfile["otherDocumentsUrl"]));
     }
   }
 
@@ -121,67 +114,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
+      extendBodyBehindAppBar: true, // Extend body behind AppBar
       appBar: AppBar(
         title: const Text('Profile'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.transparent, // Transparent AppBar
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Container(
-        color: Theme.of(context).colorScheme.background,
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16.0),
+        color: primaryColor, // Background color matching AppBar
+        child: SafeArea(
+          child: Column(
             children: [
-              ProfilePictureSection(
-                name: userProfile["name"],
-                onCameraPressed: () {
-                  _showMessage('Profile picture upload coming soon!', false);
-                },
-              ),
-              const SizedBox(height: 24),
-              PersonalInformationSection(
-                nameController: _nameController,
-                emailController: _emailController,
-                passwordController: null,
-                confirmPasswordController: null,
-                phoneController: _phoneController,
-                addressController: _addressController,
-                countryController: _countryController,
-                onNameChanged: () => setState(() {
-                  userProfile["name"] = _nameController.text;
-                }),
-                isEditable: true,
-              ),
-              const SizedBox(height: 24),
-              InvestmentDetailsSection(
-                investmentTypeController: TextEditingController(text: _investmentType),
-                bankNameController: _bankNameController,
-                accountNumberController: _accountNumberController,
-                ibanController: _ibanController,
-                taxIdController: _taxIdController,
-              ),
-              const SizedBox(height: 24),
-              DocumentsSection(
-                showMessage: _showMessage,
-                existingDocuments: _existingDocuments,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _saveChanges,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  minimumSize: const Size(double.infinity, 50),
+              SizedBox(height: 20,),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: ListView(
+                      padding: const EdgeInsets.all(16.0),
+                      children: [
+                        ProfilePictureSection(
+                          name: userProfile["name"],
+                          onCameraPressed: () {
+                            _showMessage('Profile picture upload coming soon!', false);
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        PersonalInformationSection(
+                          nameController: _nameController,
+                          emailController: _emailController,
+                          passwordController: null,
+                          confirmPasswordController: null,
+                          phoneController: _phoneController,
+                          addressController: _addressController,
+                          countryController: _countryController,
+                          onNameChanged: () => setState(() {
+                            userProfile["name"] = _nameController.text;
+                          }),
+                          isEditable: true,
+                        ),
+                        const SizedBox(height: 24),
+                        InvestmentDetailsSection(
+                          investmentTypeController: TextEditingController(text: _investmentType),
+                          bankNameController: _bankNameController,
+                          accountNumberController: _accountNumberController,
+                          ibanController: _ibanController,
+                          taxIdController: _taxIdController,
+                        ),
+                        const SizedBox(height: 24),
+                        DocumentsSection(
+                          showMessage: _showMessage,
+                          existingDocuments: _existingDocuments,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _saveChanges,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.secondary,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            minimumSize: const Size(double.infinity, 50),
+                          ),
+                          child: const Text(
+                            'Save Changes',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
                 ),
-                child: const Text(
-                  'Save Changes',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         ),

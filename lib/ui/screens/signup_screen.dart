@@ -27,30 +27,30 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     'INVITE2023-005',
   ];
 
+  // Target length for the invitation code
+  static const int _targetLength = 13; // Length of "INVITE2023-XXX"
+
   @override
   void initState() {
     super.initState();
     _invitationCodeController = TextEditingController();
     _invitationCodeController.addListener(_handleTextChange);
-    
-    // Setup animations
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _animation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut)
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    
+
     _animationController.forward();
   }
 
   void _handleTextChange() {
     final code = _invitationCodeController.text.trim();
-    
-    // Auto-validate when code matches expected pattern/length
-    if (code.length >= 13) { // "INVITE2023-XXX" format
+    if (code.length == _targetLength) { // Check only length
       _validateAndProceed();
     }
   }
@@ -64,43 +64,40 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   }
 
   Future<void> _validateAndProceed() async {
-  if (_isLoading) return;
+    if (_isLoading) return;
 
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true;
-    });
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
 
-    final invitationCode = _invitationCodeController.text.trim();
+      // Simulate API call
+      await Future.delayed(const Duration(milliseconds: 600));
 
-    // Simulate API call with a small delay
-    await Future.delayed(const Duration(milliseconds: 600));
+      final invitationCode = _invitationCodeController.text.trim();
+      if (!_validInvitationCodes.contains(invitationCode)) {
+        _showMessage('Code not in valid list (demo mode: proceeding anyway)', isError: true);
+      } else {
+        _showMessage('Invitation validated! Proceeding to registration...', isError: false);
+      }
 
-    if (!_validInvitationCodes.contains(invitationCode)) {
-      _showMessage('Invalid invitation code. Please check your email for the correct code.', isError: true);
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RegistrationScreen()),
+        );
+      }
+    } else {
       setState(() {
         _isLoading = false;
       });
-      return;
-    }
-
-    _showMessage('Invitation validated! Proceeding to registration...', isError: false);
-
-    // Wait for 6 seconds before navigating
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Navigate to next screen
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const RegistrationScreen()),
-      );
     }
   }
-}
 
   void _showMessage(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -116,21 +113,16 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   }
 
   void _scanQRCode() async {
-    // Simulate QR code scanning
     setState(() {
       _isLoading = true;
     });
-    
-    // Simulate scanning delay
+
     await Future.delayed(const Duration(milliseconds: 800));
-    
-    // Simulate successful scan
+
     if (mounted) {
       _invitationCodeController.text = 'INVITE2023-003';
       _validateAndProceed();
     }
-    
-    // In a real app, integrate qr_code_scanner package and populate _invitationCodeController
   }
 
   void _toggleInputMethod() {
@@ -141,12 +133,10 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    // Get the primary and secondary colors from the theme
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
     final textColor = Colors.white;
 
-    // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -184,10 +174,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Spacer to push content to center
                     const Spacer(),
-                    
-                    // QR Code Scanner Button - Primary Method
                     if (!_showManualInput) ...[
                       GestureDetector(
                         onTap: _isLoading ? null : _scanQRCode,
@@ -200,25 +187,23 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                           ),
                           child: _isLoading
                               ? Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                )
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
                               : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.qr_code_scanner,
-                                      size: 100,
-                                      color: Colors.white,
-                                    ),
-                                  ],
-                                ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.qr_code_scanner,
+                                size: 100,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
-                    
-                    // Manual Input Option - Secondary Method
                     if (_showManualInput) ...[
                       Container(
                         decoration: BoxDecoration(
@@ -232,15 +217,19 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                             hintText: 'INVITE2023-XXX',
                             border: InputBorder.none,
                             hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-                            suffixIcon: _isLoading 
-                              ? Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                )
-                              : null,
+                            suffixIcon: _isLoading
+                                ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              ),
+                            )
+                                : null,
                           ),
                           style: const TextStyle(
                             fontSize: 18,
@@ -252,9 +241,12 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                           keyboardType: TextInputType.text,
                           textCapitalization: TextCapitalization.characters,
                           onFieldSubmitted: (_) => _validateAndProceed(),
-                          validator: (value) => value == null || value.trim().isEmpty 
-                              ? 'Please enter an invitation code' 
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter an invitation code';
+                            }
+                            return null; // No further validation
+                          },
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(RegExp(r'[A-Z0-9-]')),
                           ],
@@ -262,38 +254,16 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         ),
                       ),
                     ],
-                    
                     const SizedBox(height: 32),
-                    
-                    // Subtle tip
-                    /* Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'Find QR code in your invitation email',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ), */
-                    
-                    // Spacer to push content to center
                     const Spacer(),
-                    
-                    // Toggle between QR scanner and Manual entry
                     TextButton(
                       onPressed: _toggleInputMethod,
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white.withOpacity(0.9),
                       ),
                       child: Text(
-                        _showManualInput 
-                            ? 'Switch to QR Code Scanner' 
+                        _showManualInput
+                            ? 'Switch to QR Code Scanner'
                             : 'Enter invitation code manually',
                         style: const TextStyle(
                           fontWeight: FontWeight.w400,

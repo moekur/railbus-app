@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class QuickActionsComponent extends StatelessWidget {
-  final VoidCallback onHistoryTap;
-  final VoidCallback onKYCTap;
-  final VoidCallback onSupportTap;
+  final VoidCallback onBuySharesTap;
+  final VoidCallback onTransactionHistoryTap;
+  final VoidCallback onAnnualReportsTap;
+  final VoidCallback onNewsTap;
 
   const QuickActionsComponent({
-    required this.onHistoryTap,
-    required this.onKYCTap,
-    required this.onSupportTap,
+    required this.onBuySharesTap,
+    required this.onTransactionHistoryTap,
+    required this.onAnnualReportsTap,
+    required this.onNewsTap,
     super.key,
   });
 
@@ -17,14 +19,40 @@ class QuickActionsComponent extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildActionTile(context, icon: Icons.history, label: 'History', onTap: onHistoryTap),
-        _buildActionTile(context, icon: Icons.upload_file, label: 'KYC', onTap: onKYCTap),
-        _buildActionTile(context, icon: Icons.message, label: 'Support', onTap: onSupportTap),
+        _buildActionTile(
+          context,
+          icon: Icons.shopping_cart,
+          label: 'Buy Shares',
+          onTap: onBuySharesTap,
+        ),
+        _buildActionTile(
+          context,
+          icon: Icons.history,
+          label: 'Transactions',
+          onTap: onTransactionHistoryTap,
+        ),
+        _buildActionTile(
+          context,
+          icon: Icons.description,
+          label: 'Reports',
+          onTap: onAnnualReportsTap,
+        ),
+        _buildActionTile(
+          context,
+          icon: Icons.article,
+          label: 'News',
+          onTap: onNewsTap,
+        ),
       ],
     );
   }
 
-  Widget _buildActionTile(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
+  Widget _buildActionTile(
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required VoidCallback onTap,
+      }) {
     return GestureDetector(
       onTap: onTap,
       child: Column(

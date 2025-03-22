@@ -79,7 +79,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
         children: [
           SafeArea(
             child: Container(
-              height: 0, 
+              height: 20,
             ),
           ),
           Expanded(
@@ -152,7 +152,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                             // Amount
                             TextFormField(
                               decoration: const InputDecoration(
-                                labelText: 'Amount (AED)',
+                                labelText: 'Share Price (AED)',
                                 border: OutlineInputBorder(),
                               ),
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),

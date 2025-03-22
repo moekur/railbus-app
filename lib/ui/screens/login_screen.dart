@@ -316,7 +316,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     ),
 
                     // Separator
-                    _buildSeparator(),
+                    if (_canUseBiometrics)
+                      _buildSeparator(),
 
                     // Biometric Login Option
                     if (_canUseBiometrics)
